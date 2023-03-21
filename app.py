@@ -1,5 +1,6 @@
 from flask import Flask, Response, jsonify, json, request
-from sb_controller import find_all_profiles, login_user, get_user
+from sb_controller import find_all_profiles, login_user, get_user, get_task_list
+from utils import get_token
 app = Flask(__name__)
 
 @app.route('/')
@@ -12,8 +13,9 @@ def login():
     data = request.get_json()
     try:
         email = data['email']
+        password = data['password']
         return jsonify({
-            'session': login_user(email),
+            'session': login_user(email, password),
         }, 201)
     except Exception as e:
         print(e)
@@ -21,15 +23,22 @@ def login():
 
 @app.route('/user')
 def user():
-    get_user()
+    token = get_token(request)
     return jsonify({
-        'user': 'bob',
+        'user': get_user(token),
     })
 
 @app.route('/profiles')
 def profiles():
     return jsonify({
         'profiles': find_all_profiles(),
+    })
+
+@app.route('/tasks')
+def tasks():
+    token = get_token(request)
+    return jsonify({
+        'tasks': get_task_list(token),
     })
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug = True)
