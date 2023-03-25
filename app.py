@@ -1,5 +1,5 @@
 from flask import Flask, Response, jsonify, json, request
-from sb_controller import find_all_profiles, login_user, get_user, get_task_list
+from sb_controller import find_all_profiles, login_user, get_user, get_task_list, get_task
 from utils import get_token
 app = Flask(__name__)
 
@@ -24,21 +24,39 @@ def login():
 @app.route('/user')
 def user():
     token = get_token(request)
-    return jsonify({
-        'user': get_user(token),
-    })
+    try:
+        return jsonify({
+            'user': get_user(token),
+        })
+    except Exception as e:
+        print(e)
+        return Response('''{"message": "Bad Request"}''', status=400, mimetype='application/json')
 
 @app.route('/profiles')
 def profiles():
-    return jsonify({
-        'profiles': find_all_profiles(),
-    })
-
+    try:
+        return jsonify({
+            'profiles': find_all_profiles(),
+        })
+    except Exception as e:
+        print(e)
+        return Response('''{"message": "Bad Request"}''', status=400, mimetype='application/json')
 @app.route('/tasks')
 def tasks():
+    try:
+        token = get_token(request)
+        return jsonify({
+            'tasks': get_task_list(token),
+        })
+    except Exception as e:
+        print(e)
+        return Response('''{"message": "Bad Request"}''', status=400, mimetype='application/json')
+@app.route('/task')
+def task():
     token = get_token(request)
+    task_id = request.get_json()['task_id']
     return jsonify({
-        'tasks': get_task_list(token),
+        'task': get_task(token, task_id),
     })
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug = True)

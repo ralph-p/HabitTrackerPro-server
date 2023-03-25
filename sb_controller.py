@@ -1,8 +1,7 @@
 
-from operator import eq
 import os
 from supabase import create_client, Client
-from utils import convert_DTO_task_list
+from utils import convert_DTO_task_list, convert_DTO_to_task
 import json
 
 url: str = os.environ.get("SUPABASE_URL")
@@ -33,11 +32,23 @@ def get_user(token):
 
 def get_task_list(token):
     supabase.postgrest.auth(token)
-    data = supabase.table("task").select("id, name, active , inserted_at, name, description, updated_at, duration,frequency,task_note(id, note, inserted_at, time),subtask(id, name, description, complete, inserted_at)").execute()
+    data = supabase.table("task").select("id, name, active , inserted_at, name, description, updated_at, duration,frequency,task_note(id, note, inserted_at, time),subtask(id, name, description, complete, inserted_at)")\
+        .execute()
     response_data = data.json()
     task_list = json.loads(response_data)['data']
     updated_task_list = convert_DTO_task_list(task_list)
-
     return updated_task_list
 
+def get_task(token, task_id):
+    supabase.postgrest.auth(token)
+    data = supabase.table("task")\
+        .select("id, name, active , inserted_at, name, description, updated_at, duration,frequency,task_note(id, note, inserted_at, time),subtask(id, name, description, complete, inserted_at)")\
+        .eq("id", task_id)\
+        .execute()
+    response_data = data.json()
+    task = json.loads(response_data)['data'][0]
+    print(task)
+    updated_task = convert_DTO_to_task(task)
+    return updated_task
+    
 
