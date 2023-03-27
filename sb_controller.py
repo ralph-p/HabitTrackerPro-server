@@ -51,4 +51,7 @@ def get_task(token, task_id):
     updated_task = convert_DTO_to_task(task)
     return updated_task
     
-
+def add_scheduled_task(token, task_id):
+    supabase.postgrest.auth(token)
+    supabase.table("scheduled_task")\
+        .upsert({"task_id": task_id, })

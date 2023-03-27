@@ -1,7 +1,10 @@
 from flask import Flask, Response, jsonify, json, request
 from sb_controller import find_all_profiles, login_user, get_user, get_task_list, get_task
 from utils import get_token
+from flask_cors import CORS
+
 app = Flask(__name__)
+CORS(app)
 
 @app.route('/')
 def hello_world():
