@@ -47,7 +47,6 @@ def get_task(token, task_id):
         .execute()
     response_data = data.json()
     task = json.loads(response_data)['data'][0]
-    print(task)
     updated_task = convert_DTO_to_task(task)
     return updated_task
     

@@ -17,13 +17,13 @@ def convert_DTO_task_list(tasks):
     return tasks
 
 def convert_DTO_to_task(task):
-    if(task['task_note'] and task['subtask']):
+    time_in_frequency = 0
+    if(task['task_note']):
         frequency = task['frequency']
         newest_note = max(task['task_note'], key=lambda x: x['inserted_at'])
         updated_at = datetime.fromisoformat(newest_note['inserted_at'])
         task['updated_at'] = updated_at.strftime('%Y-%m-%dT%H:%M:%S.%f+00:00')
 
-        time_in_frequency = 0
         if frequency == 0:
             # 0 for today
             today = datetime.utcnow().date()
@@ -50,6 +50,10 @@ def convert_DTO_to_task(task):
                 if month_start <= note_date <= month_end:
                     time_in_frequency += note['time']
                     
-        task['amount_done'] = time_in_frequency
+    task['amount_done'] = time_in_frequency
+    if not task['subtask']:
+        task['num_subtask'] = 0
+    else:
         task['num_subtask'] = len(task['subtask'])
+
     return task

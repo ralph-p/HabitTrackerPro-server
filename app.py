@@ -44,6 +44,7 @@ def profiles():
     except Exception as e:
         print(e)
         return Response('''{"message": "Bad Request"}''', status=400, mimetype='application/json')
+
 @app.route('/tasks')
 def tasks():
     try:
@@ -54,12 +55,17 @@ def tasks():
     except Exception as e:
         print(e)
         return Response('''{"message": "Bad Request"}''', status=400, mimetype='application/json')
+
 @app.route('/task')
 def task():
-    token = get_token(request)
-    task_id = request.get_json()['task_id']
-    return jsonify({
-        'task': get_task(token, task_id),
-    })
+    try:
+        token = get_token(request)
+        task_id = request.args.get('task_id')
+        return jsonify({
+            'task': get_task(token, task_id),
+        })
+    except Exception as e:
+        print(e)
+        return Response('''{"message": "Bad Request"}''', status=400, mimetype='application/json')
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug = True)
